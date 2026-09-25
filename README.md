@@ -1,2 +1,2 @@
-# AMW-Tech
-AMW Tech Repository
+# AMW Tech
+Welcome to AMW Tech repository.
