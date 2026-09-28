@@ -301,10 +301,56 @@ footer .copyright {
 
 /* Responsive */
 @media (max-width: 768px) {
-    h1 { font-size: 3rem; }
-    h2 { font-size: 2rem; }
-    .content { padding: 2rem; }
-    .features-grid { grid-template-columns: 1fr; }
-    .cta-group { flex-direction: column; }
-    button { width: 100%; }
+    h1 { font-size: 2.5rem; }
+    h2 { font-size: 1.8rem; margin-bottom: 1rem; }
+    h3 { font-size: 1.5rem; }
+    p { font-size: 1rem; }
+    
+    .story-section { padding: 0 5%; }
+    
+    .content { 
+        padding: 1.5rem; 
+        width: 100%;
+        margin: 0 auto; /* Ensure it's centered on mobile regardless of left/right alignment on desktop */
+    }
+    
+    .align-left, .align-right {
+        margin: 0 auto;
+    }
+
+    .features-grid { 
+        grid-template-columns: 1fr; 
+        gap: 1rem;
+    }
+    
+    .team-grid {
+        flex-direction: column;
+        gap: 2rem;
+    }
+
+    .cta-group { 
+        flex-direction: column; 
+        gap: 0.8rem;
+        margin-top: 1.5rem;
+    }
+    
+    button { width: 100%; padding: 0.9rem; }
+    
+    .labels {
+        justify-content: center;
+        gap: 0.5rem;
+    }
+    
+    .labels span {
+        font-size: 0.7rem;
+        padding: 0.4rem 0.8rem;
+    }
+    
+    footer { padding: 3rem 5%; }
+}
+
+@media (max-width: 480px) {
+    h1 { font-size: 2.2rem; }
+    h2 { font-size: 1.5rem; }
+    .content { padding: 1.2rem; }
 }
