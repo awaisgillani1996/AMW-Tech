@@ -1,131 +1,150 @@
-document.addEventListener("DOMContentLoaded", () => {
-    // Set current year in footer
-    document.getElementById("year").textContent = new Date().getFullYear();
+// =============================================
+// AMW TECH — MAIN SCRIPT
+// =============================================
 
-    // GSAP ScrollTrigger Setup
-    gsap.registerPlugin(ScrollTrigger);
+// Set current year in footer
+document.getElementById('year').textContent = new Date().getFullYear();
 
-    // Initial Hero Animation
-    gsap.to(".fade-up", {
-        y: 0,
-        opacity: 1,
-        duration: 1,
-        stagger: 0.2,
-        ease: "power3.out",
-        delay: 0.5
-    });
+// =============================================
+// NAVBAR — Scroll behavior
+// =============================================
+const navbar = document.getElementById('navbar');
 
-    // Scroll Animations for Text
-    const sections = document.querySelectorAll('.story-section:not(.hero-section)');
-    
-    sections.forEach(section => {
-        const elements = section.querySelectorAll('.reveal-text');
-        
-        gsap.to(elements, {
-            scrollTrigger: {
-                trigger: section,
-                start: "top 70%",
-                toggleActions: "play none none reverse"
-            },
-            y: 0,
-            opacity: 1,
-            duration: 0.8,
-            stagger: 0.1,
-            ease: "power2.out"
-        });
-    });
-
-    // Canvas Image Sequence Logic
-    const canvas = document.getElementById("hero-lightpass");
-    const context = canvas.getContext("2d");
-
-    // Set canvas dimensions
-    const resizeCanvas = () => {
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
-        // Re-draw current frame to handle resize properly
-        if (images[imageSeq.frame]) {
-            drawFrame(images[imageSeq.frame]);
-        }
-    };
-    window.addEventListener("resize", resizeCanvas);
-    
-    // There are 3 folders (1, 2, 3), but they are all mapped sequentially.
-    // Let's create an array of all file paths.
-    // Sequence 1: 1 (1).jpg to 1 (210).jpg
-    // Sequence 2: 2 (1).jpg to 2 (300).jpg
-    // Sequence 3: 3 (1).jpg to 3 (300).jpg
-    const framePaths = [];
-    
-    for (let i = 1; i <= 210; i++) framePaths.push(`Scroll Telling/1 (${i}).jpg`);
-    for (let i = 1; i <= 300; i++) framePaths.push(`Scroll Telling/2 (${i}).jpg`);
-    for (let i = 1; i <= 300; i++) framePaths.push(`Scroll Telling/3 (${i}).jpg`);
-    
-    const frameCount = framePaths.length;
-    const images = [];
-    const imageSeq = { frame: 0 };
-    
-    // Draw frame centered and covering
-    const drawFrame = (img) => {
-        const canvasRatio = canvas.width / canvas.height;
-        const imgRatio = img.width / img.height;
-        
-        let drawWidth, drawHeight, offsetX, offsetY;
-        
-        if (canvasRatio > imgRatio) {
-            drawWidth = canvas.width;
-            drawHeight = canvas.width / imgRatio;
-            offsetX = 0;
-            offsetY = (canvas.height - drawHeight) / 2;
-        } else {
-            drawHeight = canvas.height;
-            drawWidth = canvas.height * imgRatio;
-            offsetY = 0;
-            offsetX = (canvas.width - drawWidth) / 2;
-        }
-        
-        context.clearRect(0, 0, canvas.width, canvas.height);
-        context.drawImage(img, offsetX, offsetY, drawWidth, drawHeight);
-    };
-
-    // Preload first frame immediately to show something
-    const firstImg = new Image();
-    firstImg.src = framePaths[0];
-    firstImg.onload = () => {
-        resizeCanvas(); // Set dimensions and draw
-        
-        // Then start preloading everything else silently
-        preloadImages();
-    };
-    
-    images[0] = firstImg;
-
-    function preloadImages() {
-        // Preload sequentially so that early frames are ready sooner
-        for (let i = 1; i < frameCount; i++) {
-            const img = new Image();
-            img.src = framePaths[i];
-            images[i] = img;
-        }
+window.addEventListener('scroll', () => {
+    if (window.scrollY > 60) {
+        navbar.classList.add('scrolled');
+    } else {
+        navbar.classList.remove('scrolled');
     }
+});
 
-    // Link GSAP to Scroll
-    gsap.to(imageSeq, {
-        frame: frameCount - 1,
-        snap: "frame",
-        ease: "none",
-        scrollTrigger: {
-            scrub: 0.5,
-            start: "top top",
-            end: "bottom bottom",
-            trigger: "body",
-        },
-        onUpdate: () => {
-            const currentFrame = images[imageSeq.frame];
-            if (currentFrame && currentFrame.complete) {
-                drawFrame(currentFrame);
-            }
+// =============================================
+// SCROLL ANIMATIONS — Fade in on scroll
+// =============================================
+const fadeElements = document.querySelectorAll(
+    '.about-text, .about-image, .country-card, .service-card, .contact-info, .contact-form-box, .team-card, .stat, .section-header, .map-container'
+);
+
+fadeElements.forEach(el => {
+    el.classList.add('fade-in');
+});
+
+const observer = new IntersectionObserver((entries) => {
+    entries.forEach((entry, index) => {
+        if (entry.isIntersecting) {
+            setTimeout(() => {
+                entry.target.classList.add('visible');
+            }, index * 60);
+            observer.unobserve(entry.target);
         }
     });
-
+}, {
+    threshold: 0.08,
+    rootMargin: '0px 0px -40px 0px'
 });
+
+fadeElements.forEach(el => observer.observe(el));
+
+// =============================================
+// SMOOTH SCROLL — Navbar links
+// =============================================
+document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+    anchor.addEventListener('click', function(e) {
+        const target = document.querySelector(this.getAttribute('href'));
+        if (target) {
+            e.preventDefault();
+            target.scrollIntoView({ behavior: 'smooth' });
+        }
+    });
+});
+
+// =============================================
+// HERO VIDEO — Fallback if video fails
+// =============================================
+const heroVideo = document.querySelector('.hero-video');
+if (heroVideo) {
+    heroVideo.addEventListener('error', () => {
+        heroVideo.style.display = 'none';
+        document.querySelector('.hero').style.background = 'linear-gradient(135deg, #0a0a0a 0%, #1a0505 50%, #0a0a0a 100%)';
+    });
+}
+
+// =============================================
+// COUNTRY CARDS — Stagger animation
+// =============================================
+const countryCards = document.querySelectorAll('.country-card');
+const countryObserver = new IntersectionObserver((entries) => {
+    if (entries[0].isIntersecting) {
+        countryCards.forEach((card, i) => {
+            setTimeout(() => {
+                card.style.opacity = '1';
+                card.style.transform = 'translateY(0)';
+            }, i * 80);
+        });
+        countryObserver.disconnect();
+    }
+}, { threshold: 0.2 });
+
+countryCards.forEach(card => {
+    card.style.opacity = '0';
+    card.style.transform = 'translateY(20px)';
+    card.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+});
+
+if (countryCards.length > 0) {
+    countryObserver.observe(countryCards[0].parentElement);
+}
+
+// =============================================
+// CONTACT FORM
+// =============================================
+function handleFormSubmit(event) {
+    event.preventDefault();
+    const btn = document.getElementById('submitBtn');
+    const text = btn.querySelector('.btn-text');
+    const loader = btn.querySelector('.btn-loader');
+    const successMsg = document.getElementById('formSuccess');
+    
+    // Get form data
+    const name = document.getElementById('cf-name').value;
+    const phone = document.getElementById('cf-phone').value;
+    const email = document.getElementById('cf-email').value;
+    const subjectEl = document.getElementById('cf-subject');
+    const subject = subjectEl.options[subjectEl.selectedIndex].text;
+    const message = document.getElementById('cf-message').value;
+
+    // Show loading
+    text.style.display = 'none';
+    loader.style.display = 'inline-block';
+    btn.disabled = true;
+    
+    // Construct WhatsApp message
+    let waMessage = `*New Website Inquiry*%0A%0A`;
+    waMessage += `*Name:* ${name}%0A`;
+    waMessage += `*Phone:* ${phone}%0A`;
+    if(email) waMessage += `*Email:* ${email}%0A`;
+    if(subject && subject !== 'Select a topic...') waMessage += `*Subject:* ${subject}%0A`;
+    if(message) waMessage += `*Message:* ${message}%0A`;
+    
+    // Ahsan's WhatsApp Number
+    const waUrl = `https://wa.me/971507206726?text=${waMessage}`;
+
+    // Simulate short delay then open WhatsApp
+    setTimeout(() => {
+        text.style.display = 'inline-block';
+        loader.style.display = 'none';
+        btn.disabled = false;
+        
+        // Open WhatsApp chat in new tab
+        window.open(waUrl, '_blank');
+        
+        // Reset form
+        document.getElementById('contactForm').reset();
+        
+        // Show success message briefly
+        successMsg.style.display = 'block';
+        setTimeout(() => {
+            successMsg.style.display = 'none';
+        }, 5000);
+    }, 800);
+}
